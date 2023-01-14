@@ -4,13 +4,14 @@ import {AuthContext} from './AuthProvider';
 import {NavigationContainer} from '@react-navigation/native';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
+import {View, ActivityIndicator, Text} from 'react-native';
 
 export default function Routes() {
   const {user, setUser} = useContext(AuthContext);
   const [initializing, setInitializing] = useState(true);
 
   const onAuthStateChanged = (user: any) => {
-    console.log('user: ', user);
+    console.log('user: 1111', user);
     setUser(user);
     if (initializing) setInitializing(false);
   };
@@ -20,7 +21,14 @@ export default function Routes() {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  if (initializing) return null;
+  if (initializing) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center'}}>
+        <ActivityIndicator size="large" color="#00ff00" />
+        <Text>Alishan</Text>
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>
