@@ -4,13 +4,14 @@ import BackButtonHeader from '../../components/BackButtonHeader';
 import FormButton from '../../components/FormButton';
 import FormInput from '../../components/FormInput';
 import SocialButton from '../../components/SocialButton';
+import {AuthContext} from '../../navigation/AuthProvider';
 
 export default function Signup({navigation}: any) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-  const register = (_email: string, _password: string) => {};
+  const {register} = useContext(AuthContext);
 
   return (
     <>

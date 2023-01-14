@@ -7,21 +7,18 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 
 import FormInput from '../../components/FormInput';
 import FormButton from '../../components/FormButton';
 import SocialButton from '../../components/SocialButton';
-
+import {AuthContext} from '../../navigation/AuthProvider';
 export default function Login({navigation}: any) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  // const {login, googleLogin, fbLogin} = useContext(AuthContext);
-  const login = (email: string, password: string) => {
-    console.log(email, password);
-  };
-  const googleLogin = () => {};
+  const {login, googleLogin} = useContext(AuthContext);
+
   const fbLogin = () => {};
   return (
     <ScrollView contentContainerStyle={styles.container}>
