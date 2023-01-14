@@ -12,7 +12,8 @@ public class MainActivity extends ReactActivity {
   @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.show(this);  // here
-        super.onCreate(savedInstanceState);
+        super.onCreate(null);
+        // super.onCreate(savedInstanceState);
     }
     // ...other code
 
@@ -24,6 +25,7 @@ public class MainActivity extends ReactActivity {
   protected String getMainComponentName() {
     return "AwesomeProject";
   }
+  
 
   /**
    * Returns the instance of the {@link ReactActivityDelegate}. Here we use a util class {@link
