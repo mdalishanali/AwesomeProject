@@ -9,18 +9,21 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import ActionButton from 'react-native-action-button';
 import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {sizes} from '../constants/theme';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import {AuthContext} from '../navigation/AuthProvider';
 
 export default function GalleryScreen() {
-  const [image, setImage] = useState<any>(null);
+  const {user, logout} = useContext(AuthContext);
+  const [image, setImage] = useState<string>('');
   const [uploading, setUploading] = useState(false);
   const [transferred, setTransferred] = useState(0);
-  const [post, setPost] = useState('');
+  const [title, setTitle] = useState<string>('');
 
   const takePhotoFromCamera = () => {
     ImagePicker.openCamera({
@@ -30,7 +33,7 @@ export default function GalleryScreen() {
     }).then(image => {
       console.log('image', image);
       const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-      setImage(imageUri);
+      imageUri && setImage(imageUri);
     });
   };
 
@@ -45,36 +48,60 @@ export default function GalleryScreen() {
     }).then(image => {
       console.log(image);
       const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-      setImage(imageUri);
+      imageUri && setImage(imageUri);
     });
+  };
+
+  const submitPost = async () => {
+    const imageUrl = await uploadImage();
+    firestore()
+      .collection('photos')
+      .add({
+        userId: user.uid,
+        title: title,
+        postImg: imageUrl,
+        postTime: firestore.Timestamp.fromDate(new Date()),
+      })
+      .then(() => {
+        console.log('Post Added!');
+        Alert.alert(
+          'Post published!',
+          'Your post has been published Successfully!',
+        );
+        setTitle('');
+      })
+      .catch(error => {
+        console.log(
+          'Something went wrong with added post to firestore.',
+          error,
+        );
+      });
   };
 
   const uploadImage = async () => {
     if (image == null) {
       return null;
     }
-    const uploadUri = image;
-    let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
-    const extension = filename.split('.').pop();
-    const name = filename.split('.').slice(0, -1).join('.');
-    filename = name + Date.now() + '.' + extension;
-    setUploading(true);
-    setTransferred(0);
-    const storageRef = storage().ref(`photos/${filename}`);
-    const task = storageRef.putFile(uploadUri);
-    task.on('state_changed', taskSnapshot => {
-      setTransferred(
-        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-          100,
-      );
-    });
-
     try {
+      const uploadUri = image;
+      let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
+      const extension = filename.split('.').pop();
+      const name = filename.split('.').slice(0, -1).join('.');
+      filename = name + Date.now() + '.' + extension;
+      setUploading(true);
+      setTransferred(0);
+      const storageRef = storage().ref(`photos/${filename}`);
+      const task = storageRef.putFile(uploadUri);
+      task.on('state_changed', taskSnapshot => {
+        setTransferred(
+          Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+            100,
+        );
+      });
       await task;
       const url = await storageRef.getDownloadURL();
-      console.log('url: ', url);
       setUploading(false);
-      setImage(null);
+      setImage('');
       Alert.alert(
         'Image uploaded!',
         'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
@@ -92,8 +119,8 @@ export default function GalleryScreen() {
         placeholder="What's on your mind?"
         multiline
         numberOfLines={4}
-        // value={post}
-        // onChangeText={content => setPost(content)}
+        value={title}
+        onChangeText={content => setTitle(content)}
       />
       {image ? <Image style={styles.image} source={{uri: image}} /> : null}
       {uploading ? (
@@ -103,7 +130,7 @@ export default function GalleryScreen() {
         </View>
       ) : (
         <TouchableOpacity
-          onPress={uploadImage}
+          onPress={submitPost}
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
