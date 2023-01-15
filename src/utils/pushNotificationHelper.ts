@@ -9,6 +9,7 @@ export async function requestUserPermission() {
 
         if (enabled) {
                 console.log('Authorization status:', authStatus);
+                console.log('permission allowed', enabled);
                 getFCMToken();
         }
 }
@@ -51,7 +52,5 @@ export const notificationListener = () => {
                         }
                 });
 
-        messaging().onMessage(async romoteMessage => {
-                console.log("notificatinon on foreground state...", romoteMessage);
-        })
+
 }
