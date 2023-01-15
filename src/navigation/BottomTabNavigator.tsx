@@ -23,19 +23,19 @@ export default function BottomTabNavigator() {
 
   return (
     <Tab.Navigator
-      initialRouteName={Routes.NOTIFICATION}
+      initialRouteName={Routes.NOTE}
       screenOptions={({route}) => ({
         tabBarIcon: ({focused, color, size}) => {
           let iconName = '';
           let routeName = route.name;
           if (routeName === Routes.NOTIFICATION) {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? 'notifications' : 'notifications-outline';
           } else if (routeName === Routes.GALLERY) {
-            iconName = focused ? 'list' : 'list-outline';
+            iconName = focused ? 'images' : 'images-outline';
           } else if (routeName === Routes.NOTE) {
-            iconName = focused ? 'settings' : 'settings-outline';
+            iconName = focused ? 'chatbox-ellipses' : 'chatbox-ellipses-outline';
           } else if (routeName === Routes.CALCULATOR) {
-            iconName = focused ? 'settings' : 'settings-outline';
+            iconName = focused ? 'calculator' : 'calculator-outline';
           }
           return <Icon name={iconName} size={size} color={color} />;
         },

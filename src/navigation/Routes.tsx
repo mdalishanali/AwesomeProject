@@ -22,12 +22,15 @@ export default function Routes() {
   }, []);
 
   if (initializing) {
-    return (
-      <View style={{flex: 1, justifyContent: 'center'}}>
-        <ActivityIndicator size="large" color="#00ff00" />
-      </View>
-    );
+    return null;
   }
+  // if (initializing) {
+  //   return (
+  //     <View style={{flex: 1, justifyContent: 'center'}}>
+  //       <ActivityIndicator size="large" color="#00ff00" />
+  //     </View>
+  //   );
+  // }
 
   return (
     <NavigationContainer>
