@@ -23,7 +23,7 @@ export default function BottomTabNavigator() {
 
   return (
     <Tab.Navigator
-      initialRouteName={Routes.NOTE}
+      initialRouteName={Routes.CALCULATOR}
       screenOptions={({route}) => ({
         tabBarIcon: ({focused, color, size}) => {
           let iconName = '';

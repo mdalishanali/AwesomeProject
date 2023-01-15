@@ -98,18 +98,19 @@ export default function NoteScreen() {
         <View style={{flex: 1, justifyContent: 'center'}}>
           <ActivityIndicator size="large" />
         </View>
-      ) : null}
-      <GiftedChat
-        messages={messages}
-        onSend={(messages: any) => onSend(messages)}
-        renderBubble={renderBubble}
-        renderSend={renderSend}
-        alwaysShowSend={true}
-        scrollToBottomComponent={scrollToBottomComponent}
-        user={{
-          _id: user.uid,
-        }}
-      />
+      ) : (
+        <GiftedChat
+          messages={messages}
+          onSend={(messages: any) => onSend(messages)}
+          renderBubble={renderBubble}
+          renderSend={renderSend}
+          alwaysShowSend={true}
+          scrollToBottomComponent={scrollToBottomComponent}
+          user={{
+            _id: user.uid,
+          }}
+        />
+      )}
     </>
   );
 }

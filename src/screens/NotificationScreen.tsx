@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, Button} from 'react-native';
+import {StyleSheet, TouchableOpacity, Text, View, Button} from 'react-native';
 import React from 'react';
 
 export default function NotificationScreen() {
@@ -18,28 +18,26 @@ export default function NotificationScreen() {
 
       let headers = new Headers({
         'Content-Type': 'application/json',
-        'Authorization': `key=${FIREBASE_API_KEY}`,
+        Authorization: `key=${FIREBASE_API_KEY}`,
       });
       let response = await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(message),
       });
-      console.log('response: ', response);
       const data = await response.json();
-      console.log('data: ', data);
     } catch (error) {
       console.log('error: ', error);
     }
   };
 
   return (
-    <View>
-      <Text>NotificationScreen</Text>
+    <View style={styles.container}>
       <Button title="Send Notification" onPress={sendNotification} />
-      {/* <Touca */}
     </View>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {flex: 1, justifyContent: 'center', paddingHorizontal: 20},
+});
