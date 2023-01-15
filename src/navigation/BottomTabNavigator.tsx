@@ -23,7 +23,7 @@ export default function BottomTabNavigator() {
 
   return (
     <Tab.Navigator
-      initialRouteName={Routes.GALLERY}
+      initialRouteName={Routes.NOTIFICATION}
       screenOptions={({route}) => ({
         tabBarIcon: ({focused, color, size}) => {
           let iconName = '';
