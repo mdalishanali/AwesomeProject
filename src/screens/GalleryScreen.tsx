@@ -8,142 +8,88 @@ import {
   Alert,
   ActivityIndicator,
   TouchableOpacity,
+  Button,
+  ScrollView,
+  FlatList,
 } from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import ActionButton from 'react-native-action-button';
-import ImagePicker from 'react-native-image-crop-picker';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {sizes} from '../constants/theme';
-import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import {AuthContext} from '../navigation/AuthProvider';
+import routes from '../constants/routes';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
-export default function GalleryScreen() {
+export default function GalleryScreen({navigation}: any) {
   const {user, logout} = useContext(AuthContext);
-  const [image, setImage] = useState<string>('');
-  const [uploading, setUploading] = useState(false);
-  const [transferred, setTransferred] = useState(0);
+  const [images, setImages] = useState<any>(['a']);
   const [title, setTitle] = useState<string>('');
 
-  const takePhotoFromCamera = () => {
-    ImagePicker.openCamera({
-      width: 1200,
-      height: 780,
-      cropping: false,
-    }).then(image => {
-      console.log('image', image);
-      const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-      imageUri && setImage(imageUri);
-    });
-  };
-
-  const choosePhotoFromLibrary = () => {
-    ImagePicker.openPicker({
-      width: 1200,
-      height: 780,
-      cropping: true,
-      compressImageMaxHeight: 300,
-      compressImageMaxWidth: 300,
-      compressImageQuality: 0.7,
-    }).then(image => {
-      console.log(image);
-      const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-      imageUri && setImage(imageUri);
-    });
-  };
-
-  const submitPost = async () => {
-    const imageUrl = await uploadImage();
-    firestore()
-      .collection('photos')
-      .add({
-        userId: user.uid,
-        title: title,
-        postImg: imageUrl,
-        postTime: firestore.Timestamp.fromDate(new Date()),
-      })
-      .then(() => {
-        console.log('Post Added!');
-        Alert.alert(
-          'Post published!',
-          'Your post has been published Successfully!',
-        );
-        setTitle('');
-      })
-      .catch(error => {
-        console.log(
-          'Something went wrong with added post to firestore.',
-          error,
-        );
-      });
-  };
-
-  const uploadImage = async () => {
-    if (image == null) {
-      return null;
-    }
+  useEffect(() => {
+    getAllPhotos();
+  }, []);
+  const getAllPhotos = async () => {
     try {
-      const uploadUri = image;
-      let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
-      const extension = filename.split('.').pop();
-      const name = filename.split('.').slice(0, -1).join('.');
-      filename = name + Date.now() + '.' + extension;
-      setUploading(true);
-      setTransferred(0);
-      const storageRef = storage().ref(`photos/${filename}`);
-      const task = storageRef.putFile(uploadUri);
-      task.on('state_changed', taskSnapshot => {
-        setTransferred(
-          Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-            100,
-        );
-      });
-      await task;
-      const url = await storageRef.getDownloadURL();
-      setUploading(false);
-      setImage('');
-      Alert.alert(
-        'Image uploaded!',
-        'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
-      );
-      return url;
+      const list: any = [];
+      console.log('alisahn called once');
+      await firestore()
+        .collection('photos')
+        .where('userId', '==', user.uid)
+        .orderBy('postTime', 'desc')
+        .get()
+        .then(querySnapshot => {
+          console.log('querySnapshot: ', querySnapshot);
+          querySnapshot.forEach((doc: any) => {
+            if (doc.exists) {
+              console.log('doc.data: ', doc.data());
+              list.push(doc.data());
+            }
+          });
+        });
+      // if (loading) {
+      //   setLoading(false);
+      // }
+      console.log('list:**** ', list);
+      setImages(list);
     } catch (e) {
-      console.log(e);
-      return null;
+      // setLoading(false);
     }
+  };
+
+  const openDetails = () => {
+    navigation.navigate(routes.IMAGE_DETAILS);
   };
   return (
-    <View style={styles.container}>
-      <Text>GalleryScreen</Text>
-      <TextInput
-        placeholder="What's on your mind?"
-        multiline
-        numberOfLines={4}
-        value={title}
-        onChangeText={content => setTitle(content)}
-      />
-      {image ? <Image style={styles.image} source={{uri: image}} /> : null}
-      {uploading ? (
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          <Text>{transferred} % Completed!</Text>
-          <ActivityIndicator size="large" color="#0000ff" />
+    <View>
+      <Button title="Upload Photo" onPress={openDetails} />
+
+      {false ? (
+        <View>
+          <ActivityIndicator />
         </View>
       ) : (
-        <TouchableOpacity
-          onPress={submitPost}
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            backgroundColor: '#2e64e515',
-            borderRadius: 5,
-            paddingHorizontal: 10,
-            paddingVertical: 25,
-          }}>
-          <Text>Post</Text>
-        </TouchableOpacity>
+        <View>
+          <FlatList
+            data={images}
+            renderItem={({item}) => (
+              // <PostCard
+              //   item={item}
+              //   onPress={() =>
+              //     navigation.navigate('HomeProfile', {userId: item.userId})
+              //   }
+              // />
+              <View>
+                <Text>alosa</Text>
+              </View>
+            )}
+            // keyExtractor={item => item.id}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
       )}
+
       <ActionButton buttonColor="#2e64e5">
-        <ActionButton.Item
+        {/* <ActionButton.Item
           buttonColor="#9b59b6"
           title="Take Photo"
           onPress={takePhotoFromCamera}>
@@ -154,26 +100,26 @@ export default function GalleryScreen() {
           title="Choose Photo"
           onPress={choosePhotoFromLibrary}>
           <Icon name="md-images-outline" style={styles.actionButtonIcon} />
-        </ActionButton.Item>
+        </ActionButton.Item> */}
       </ActionButton>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionButtonIcon: {
-    fontSize: 20,
-    height: 22,
-    color: 'white',
-  },
-  image: {
-    width: sizes.width - 20,
-    height: 220,
-    marginBottom: 15,
-  },
+  // container: {
+  //   flex: 1,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // actionButtonIcon: {
+  //   fontSize: 20,
+  //   height: 22,
+  //   color: 'white',
+  // },
+  // image: {
+  //   width: sizes.width - 20,
+  //   height: 220,
+  //   marginBottom: 15,
+  // },
 });

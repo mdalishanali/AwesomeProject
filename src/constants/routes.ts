@@ -9,6 +9,8 @@ export default {
 
         NOTIFICATION: 'Notification',
         GALLERY: 'Gallery',
+        GALLERY_STACK: 'GalleryStack',
         NOTE: 'Note',
-        CALCULATOR: 'Calculator'
+        CALCULATOR: 'Calculator',
+        IMAGE_DETAILS:'ImageDetails'
 };

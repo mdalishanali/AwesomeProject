@@ -7,3 +7,4 @@ export {default as NotificationScreen} from './NotificationScreen';
 export {default as GalleryScreen} from './GalleryScreen';
 export {default as NoteScreen} from './NoteScreen';
 export {default as CalculatorScreen} from './CalculatorScreen';
+export {default as ImageDetailScreen} from './ImageDetailScreen';
