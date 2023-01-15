@@ -15,8 +15,8 @@ export default function Signup({navigation}: any) {
 
   return (
     <>
-      <BackButtonHeader />
       <View style={styles.container}>
+        <BackButtonHeader />
         <Text style={styles.text}>Create an account</Text>
 
         <FormInput

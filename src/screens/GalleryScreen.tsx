@@ -1,12 +1,25 @@
-import {Platform, StyleSheet, Text, View, TextInput, Image} from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Image,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useState} from 'react';
 import ActionButton from 'react-native-action-button';
 import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {sizes} from '../constants/theme';
+import storage from '@react-native-firebase/storage';
 
 export default function GalleryScreen() {
   const [image, setImage] = useState<any>(null);
+  const [uploading, setUploading] = useState(false);
+  const [transferred, setTransferred] = useState(0);
   const [post, setPost] = useState('');
 
   const takePhotoFromCamera = () => {
@@ -36,6 +49,42 @@ export default function GalleryScreen() {
     });
   };
 
+  const uploadImage = async () => {
+    if (image == null) {
+      return null;
+    }
+    const uploadUri = image;
+    let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
+    const extension = filename.split('.').pop();
+    const name = filename.split('.').slice(0, -1).join('.');
+    filename = name + Date.now() + '.' + extension;
+    setUploading(true);
+    setTransferred(0);
+    const storageRef = storage().ref(`photos/${filename}`);
+    const task = storageRef.putFile(uploadUri);
+    task.on('state_changed', taskSnapshot => {
+      setTransferred(
+        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+          100,
+      );
+    });
+
+    try {
+      await task;
+      const url = await storageRef.getDownloadURL();
+      console.log('url: ', url);
+      setUploading(false);
+      setImage(null);
+      Alert.alert(
+        'Image uploaded!',
+        'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
+      );
+      return url;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  };
   return (
     <View style={styles.container}>
       <Text>GalleryScreen</Text>
@@ -47,6 +96,25 @@ export default function GalleryScreen() {
         // onChangeText={content => setPost(content)}
       />
       {image ? <Image style={styles.image} source={{uri: image}} /> : null}
+      {uploading ? (
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Text>{transferred} % Completed!</Text>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+        <TouchableOpacity
+          onPress={uploadImage}
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            backgroundColor: '#2e64e515',
+            borderRadius: 5,
+            paddingHorizontal: 10,
+            paddingVertical: 25,
+          }}>
+          <Text>Post</Text>
+        </TouchableOpacity>
+      )}
       <ActionButton buttonColor="#2e64e5">
         <ActionButton.Item
           buttonColor="#9b59b6"
@@ -79,6 +147,6 @@ const styles = StyleSheet.create({
   image: {
     width: sizes.width - 20,
     height: 220,
-    marginBottom: 15
+    marginBottom: 15,
   },
 });
