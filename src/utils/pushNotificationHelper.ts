@@ -8,8 +8,6 @@ export async function requestUserPermission() {
                 authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
         if (enabled) {
-                console.log('Authorization status:', authStatus);
-                console.log('permission allowed', enabled);
                 getFCMToken();
         }
 }
