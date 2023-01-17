@@ -12,7 +12,7 @@ export default function NoteScreen() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     getAllNotes();
-  }, []);
+  });
 
   const getAllNotes = async () => {
     try {
@@ -30,10 +30,10 @@ export default function NoteScreen() {
             }
           });
         });
+      setMessages(list);
       if (loading) {
         setLoading(false);
       }
-      setMessages(list);
     } catch (e) {
       setLoading(false);
     }

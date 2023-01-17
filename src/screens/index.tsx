@@ -8,3 +8,4 @@ export {default as GalleryScreen} from './GalleryScreen';
 export {default as NoteScreen} from './NoteScreen';
 export {default as CalculatorScreen} from './CalculatorScreen';
 export {default as ImageDetailScreen} from './ImageDetailScreen';
+export {default as ImageViewEditScreen} from './ImageViewEditScreen';

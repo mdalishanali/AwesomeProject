@@ -10,11 +10,14 @@ export const AuthContext = createContext<any>(undefined);
 
 export const AuthProvider = ({children}: any) => {
   const [user, setUser] = useState(null);
+  const [fcm, setFcm] = useState('');
   return (
     <AuthContext.Provider
       value={{
         user,
         setUser,
+        fcm,
+        setFcm,
         login: async (email: string, password: string) => {
           try {
             await auth().signInWithEmailAndPassword(email, password);

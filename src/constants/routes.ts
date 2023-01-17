@@ -12,5 +12,6 @@ export default {
         GALLERY_STACK: 'GalleryStack',
         NOTE: 'Note',
         CALCULATOR: 'Calculator',
-        IMAGE_DETAILS:'ImageDetails'
+        IMAGE_DETAILS:'ImageDetails',
+        IMAGE_VIEW_EDIT:'ImageViewEdit'
 };

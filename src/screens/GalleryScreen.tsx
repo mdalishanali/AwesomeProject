@@ -1,5 +1,4 @@
 import {
-  Platform,
   StyleSheet,
   Text,
   View,
@@ -19,107 +18,113 @@ import firestore from '@react-native-firebase/firestore';
 import {AuthContext} from '../navigation/AuthProvider';
 import routes from '../constants/routes';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import ProgressiveImage from '../components/ProgressiveImage';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function GalleryScreen({navigation}: any) {
   const {user, logout} = useContext(AuthContext);
-  const [images, setImages] = useState<any>(['a']);
-  const [title, setTitle] = useState<string>('');
+  const [images, setImages] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getAllPhotos();
   }, []);
+
   const getAllPhotos = async () => {
     try {
       const list: any = [];
-      console.log('alisahn called once');
       await firestore()
         .collection('photos')
         .where('userId', '==', user.uid)
-        .orderBy('postTime', 'desc')
         .get()
         .then(querySnapshot => {
-          console.log('querySnapshot: ', querySnapshot);
           querySnapshot.forEach((doc: any) => {
             if (doc.exists) {
-              console.log('doc.data: ', doc.data());
               list.push(doc.data());
             }
           });
         });
-      // if (loading) {
-      //   setLoading(false);
-      // }
-      console.log('list:**** ', list);
+      if (loading) {
+        setLoading(false);
+      }
       setImages(list);
     } catch (e) {
-      // setLoading(false);
+      setLoading(false);
     }
   };
-
   const openDetails = () => {
     navigation.navigate(routes.IMAGE_DETAILS);
   };
-  return (
-    <View>
-      <Button title="Upload Photo" onPress={openDetails} />
 
-      {false ? (
+  return (
+    <View style={styles.container}>
+      {loading ? (
         <View>
           <ActivityIndicator />
         </View>
       ) : (
         <View>
-          <FlatList
-            data={images}
-            renderItem={({item}) => (
-              // <PostCard
-              //   item={item}
-              //   onPress={() =>
-              //     navigation.navigate('HomeProfile', {userId: item.userId})
-              //   }
-              // />
-              <View>
-                <Text>alosa</Text>
-              </View>
-            )}
-            // keyExtractor={item => item.id}
-            showsVerticalScrollIndicator={false}
-          />
+          {images.length ? (
+            <FlatList
+              data={images}
+              keyExtractor={item => item.postImg}
+              numColumns={2}
+              showsVerticalScrollIndicator={false}
+              style={{alignSelf: 'stretch'}}
+              initialNumToRender={5}
+              renderItem={({item, index}) => {
+                return (
+                  <View
+                    style={{
+                      height: 305,
+                      width: sizes.width / 2 - 20,
+                      margin: 10,
+                    }}
+                    key={index}>
+                    <Image
+                      source={{uri: item.postImg}}
+                      style={{
+                        height: 300,
+                        width: sizes.width / 2 - 20,
+                        borderRadius: 10,
+                      }}
+                    />
+                  </View>
+                );
+              }}
+            />
+          ) : (
+            <Text>No Items exists</Text>
+          )}
         </View>
       )}
 
       <ActionButton buttonColor="#2e64e5">
-        {/* <ActionButton.Item
-          buttonColor="#9b59b6"
-          title="Take Photo"
-          onPress={takePhotoFromCamera}>
-          <Icon name="camera-outline" style={styles.actionButtonIcon} />
-        </ActionButton.Item>
         <ActionButton.Item
-          buttonColor="#3498db"
-          title="Choose Photo"
-          onPress={choosePhotoFromLibrary}>
-          <Icon name="md-images-outline" style={styles.actionButtonIcon} />
-        </ActionButton.Item> */}
+          buttonColor="#9b59b6"
+          title="Upload Photo"
+          onPress={openDetails}>
+          <Icon name="images" style={styles.actionButtonIcon} />
+        </ActionButton.Item>
       </ActionButton>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  // },
-  // actionButtonIcon: {
-  //   fontSize: 20,
-  //   height: 22,
-  //   color: 'white',
-  // },
-  // image: {
-  //   width: sizes.width - 20,
-  //   height: 220,
-  //   marginBottom: 15,
-  // },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: 'white',
+  },
+  image: {
+    width: sizes.width - 20,
+    height: 220,
+    marginBottom: 15,
+  },
 });

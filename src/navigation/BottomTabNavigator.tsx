@@ -19,15 +19,30 @@ import {
 } from '../screens/index';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import routes from '../constants/routes';
+import ImageViewEdit from '../screens/ImageViewEditScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const GalleryStack = ({navigation}: any) => (
   <Stack.Navigator>
-    <Stack.Screen name={Routes.GALLERY} component={GalleryScreen} />
+    <Stack.Screen
+      name={Routes.GALLERY}
+      component={GalleryScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
     <Stack.Screen
       name={Routes.IMAGE_DETAILS}
       component={ImageDetailScreen}
+      options={({route}) => ({
+        title: 'Details',
+        headerBackTitleVisible: false,
+      })}
+    />
+    <Stack.Screen
+      name={Routes.IMAGE_VIEW_EDIT}
+      component={ImageViewEdit}
       options={({route}) => ({
         title: 'Details',
         headerBackTitleVisible: false,

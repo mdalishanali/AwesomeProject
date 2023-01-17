@@ -1,14 +1,29 @@
 import {StyleSheet, TouchableOpacity, Text, View, Button} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState, useContext} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AuthContext} from '../navigation/AuthProvider';
 
 export default function NotificationScreen() {
+  const {logout} = useContext(AuthContext);
+
+  const [fcmToken, setFcmToken] = useState('');
+
+  useEffect(() => {
+    getToken();
+  }, []);
+
+  const getToken = async () => {
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    fcmToken && setFcmToken(fcmToken);
+  };
+
   const sendNotification = async () => {
     try {
       const FIREBASE_API_KEY =
         'AAAA1jCwSvE:APA91bHfmjWqCdeSuYtE7EGdMGIPoIwZjp5QqEEySzzQGv7fEecp_Cg_Uym_ezF00OugiZkVJKu7bm_4qDMyaU9Q-JGbK5jdiE2vFMSQ8YCRSKNR_uRfq7PAIGPvbDATenVvvmRWx8tH';
 
       const message = {
-        to: 'fX7Tt2BEQNSs5XGYfKqNgV:APA91bHixEOKBQ5WdUncwzPGlDh1CmbHCzYxVaGCDzUcT4jaPLUjEZ4UceIvk0ibC3dBUpx5gkqkzF9kAGSyLEJ3AHd1jUfazMaErb1wxngO5hRpJ9IxqR553b9cQY0JU4HZ8Vp7FM0D',
+        to: fcmToken,
         notification: {
           messageId: 'messageId',
           title: 'Coders Never quit',
@@ -33,7 +48,11 @@ export default function NotificationScreen() {
 
   return (
     <View style={styles.container}>
-      <Button title="Send Notification" onPress={sendNotification} />
+      <View style={{marginBottom: 20}}>
+        <Button title="Send Notification" onPress={sendNotification} />
+      </View>
+
+      <Button title="Logout" onPress={logout} />
     </View>
   );
 }
