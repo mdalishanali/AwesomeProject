@@ -1,5 +1,12 @@
 import React, {useContext, useState} from 'react';
-import {View, Text, TouchableOpacity, Platform, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Platform,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import BackButtonHeader from '../../components/BackButtonHeader';
 import FormButton from '../../components/FormButton';
 import FormInput from '../../components/FormInput';
@@ -11,7 +18,7 @@ export default function Signup({navigation}: any) {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-  const {register} = useContext(AuthContext);
+  const {register, googleLogin} = useContext(AuthContext);
 
   return (
     <>
@@ -56,7 +63,7 @@ export default function Signup({navigation}: any) {
           <Text style={styles.color_textPrivate}>
             By registering, you confirm that you accept our{' '}
           </Text>
-          <TouchableOpacity onPress={() => alert('Terms Clicked!')}>
+          <TouchableOpacity onPress={() => Alert.alert('Terms Clicked!')}>
             <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
               Terms of service
             </Text>
@@ -74,7 +81,9 @@ export default function Signup({navigation}: any) {
               btnType="facebook"
               color="#4867aa"
               backgroundColor="#e6eaf4"
-              onPress={() => {}}
+              onPress={() => {
+                googleLogin();
+              }}
             />
 
             <SocialButton
@@ -82,7 +91,9 @@ export default function Signup({navigation}: any) {
               btnType="google"
               color="#de4d41"
               backgroundColor="#f5e7ea"
-              onPress={() => {}}
+              onPress={() => {
+                googleLogin();
+              }}
             />
           </View>
         ) : null}

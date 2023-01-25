@@ -62,7 +62,7 @@ export default function Login({navigation}: any) {
             btnType="facebook"
             color="#4867aa"
             backgroundColor="#e6eaf4"
-            onPress={() => fbLogin()}
+            onPress={() => googleLogin()}
           />
 
           <SocialButton
